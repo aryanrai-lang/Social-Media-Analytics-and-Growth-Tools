@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarDays, Sparkles, Loader2 } from "lucide-react";
 
 const ContentPlan = () => {

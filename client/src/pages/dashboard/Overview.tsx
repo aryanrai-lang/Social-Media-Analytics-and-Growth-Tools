@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { dashboardApi } from "@/api/dashboard";
 import { dataApi } from "@/api/data";
-import { workspacesApi, type Workspace } from "@/api/workspaces";
+import { type Workspace } from "@/api/workspaces";
 import {
   Card,
   CardContent,
