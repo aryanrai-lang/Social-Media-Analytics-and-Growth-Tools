@@ -68,7 +68,7 @@ export const generateGapAnalysis = async (req: AuthRequest, res: Response): Prom
       type: "gap_analysis",
       input: { ownerAnalytics: data.ownerAnalytics, gaps: data.gaps },
       output,
-      aiModel: "gemini-1.5-flash",
+      aiModel: "gemini-2.0-flash",
     });
 
     res.json(generation);
@@ -104,7 +104,7 @@ export const generateContentPlan = async (req: AuthRequest, res: Response): Prom
       type: "content_plan",
       input: { ownerAnalytics: data.ownerAnalytics, gaps: data.gaps, trends, period },
       output,
-      aiModel: "gemini-1.5-flash",
+      aiModel: "gemini-2.0-flash",
     });
 
     res.json(generation);
@@ -138,7 +138,7 @@ export const generateGrowthStrategy = async (req: AuthRequest, res: Response): P
       type: "growth_strategy",
       input: { ownerAnalytics: data.ownerAnalytics, gaps: data.gaps },
       output,
-      aiModel: "gemini-1.5-flash",
+      aiModel: "gemini-2.0-flash",
     });
 
     res.json(generation);
@@ -173,7 +173,7 @@ export const generateContentIdeas = async (req: AuthRequest, res: Response): Pro
       type: "content_ideas",
       input: { niche, trends },
       output,
-      aiModel: "gemini-1.5-flash",
+      aiModel: "gemini-2.0-flash",
     });
 
     res.json(generation);

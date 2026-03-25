@@ -25,57 +25,77 @@ interface ApifyPostResult {
 
 export const apifyService = {
   getClient(): ApifyClient {
-    return new ApifyClient({ token: (env as any).APIFY_API_TOKEN });
+    return new ApifyClient({ token: env.APIFY_API_TOKEN });
   },
 
   async scrapeProfile(username: string): Promise<ApifyProfileResult | null> {
     const client = this.getClient();
-    const startedAt = Date.now();
 
-    const run = await client.actor("apify/instagram-profile-scraper").call({
-      usernames: [username],
+    console.log(`[Apify] Scraping profile: @${username}`);
+
+    const run = await client.actor("apify/instagram-scraper").call({
+      directUrls: [`https://www.instagram.com/${username}/`],
+      resultsType: "details",
       resultsLimit: 1,
+      searchType: "hashtag",
+      searchLimit: 1,
     });
 
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
+    console.log(`[Apify] Profile results for @${username}: ${items.length} items`);
+
     if (!items.length) return null;
 
     const item = items[0] as any;
+    console.log(`[Apify] Profile data keys:`, Object.keys(item).join(", "));
+
     return {
       username: item.username || username,
-      fullName: item.fullName || "",
-      biography: item.biography || "",
-      followersCount: item.followersCount || 0,
-      followsCount: item.followsCount || 0,
-      postsCount: item.postsCount || 0,
-      profilePicUrl: item.profilePicUrl || "",
-      isVerified: item.isVerified || false,
+      fullName: item.fullName || item.full_name || "",
+      biography: item.biography || item.bio || "",
+      followersCount: item.followersCount || item.followedBy || 0,
+      followsCount: item.followsCount || item.follows || 0,
+      postsCount: item.postsCount || item.mediaCount || 0,
+      profilePicUrl: item.profilePicUrl || item.profilePicUrlHD || "",
+      isVerified: item.isVerified || item.verified || false,
     };
   },
 
-  async scrapePosts(username: string, limit = 25): Promise<ApifyPostResult[]> {
+  async scrapePosts(username: string, limit = 20): Promise<ApifyPostResult[]> {
     const client = this.getClient();
 
-    const run = await client.actor("apify/instagram-post-scraper").call({
-      username,
+    console.log(`[Apify] Scraping posts: @${username} (limit: ${limit})`);
+
+    const run = await client.actor("apify/instagram-scraper").call({
+      directUrls: [`https://www.instagram.com/${username}/`],
+      resultsType: "posts",
       resultsLimit: limit,
+      searchType: "hashtag",
+      searchLimit: 1,
     });
 
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
+    console.log(`[Apify] Post results for @${username}: ${items.length} items`);
+
+    if (items.length > 0) {
+      console.log(`[Apify] Post data keys:`, Object.keys(items[0]).join(", "));
+    }
 
     return items.map((item: any) => ({
-      id: item.id || item.shortCode || "",
-      type: item.type || "image",
+      id: item.id || item.shortCode || item.pk || "",
+      type: item.type || item.productType || "image",
       caption: item.caption || "",
-      likesCount: item.likesCount || 0,
-      commentsCount: item.commentsCount || 0,
-      timestamp: item.timestamp || "",
-      url: item.url || "",
-      displayUrl: item.displayUrl || "",
+      likesCount: item.likesCount || item.likes || 0,
+      commentsCount: item.commentsCount || item.comments || 0,
+      timestamp: item.timestamp || item.takenAt || "",
+      url: item.url || item.webLink || "",
+      displayUrl: item.displayUrl || item.imageUrl || "",
     }));
   },
 
   isConfigured(): boolean {
-    return !!(env as any).APIFY_API_TOKEN;
+    const configured = !!env.APIFY_API_TOKEN;
+    console.log(`[Apify] isConfigured: ${configured}`);
+    return configured;
   },
 };
