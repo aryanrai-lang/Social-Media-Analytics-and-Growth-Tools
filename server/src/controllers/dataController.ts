@@ -7,6 +7,7 @@ import { FetchLog } from "../models/FetchLog";
 import { apifyService } from "../services/apifyService";
 import { perplexityService } from "../services/perplexityService";
 import { redditService } from "../services/redditService";
+import { User } from "../models/User";
 
 export const fetchWorkspaceData = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -131,9 +132,13 @@ export const fetchTrends = async (req: AuthRequest, res: Response): Promise<void
     const { niche, keywords } = req.body;
     const results: Record<string, any> = { trends: [], reddit: [] };
 
-    if (perplexityService.isConfigured() && niche) {
+    // Check for user's Perplexity key
+    const user = await User.findById(req.userId).select("+apiKeys.perplexityKey");
+    const userPerplexityKey = user?.apiKeys?.perplexityKey;
+
+    if (perplexityService.isConfigured(userPerplexityKey) && niche) {
       try {
-        results.trends = await perplexityService.searchTrends(niche, keywords || []);
+        results.trends = await perplexityService.searchTrends(niche, keywords || [], userPerplexityKey);
       } catch (error: any) {
         results.trendsError = error.message;
       }

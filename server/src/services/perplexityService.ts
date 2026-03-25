@@ -16,7 +16,8 @@ interface ContentIdea {
 const PERPLEXITY_BASE_URL = "https://api.perplexity.ai";
 
 export const perplexityService = {
-  async searchTrends(niche: string, keywords: string[]): Promise<TrendResult[]> {
+  async searchTrends(niche: string, keywords: string[], userApiKey?: string): Promise<TrendResult[]> {
+    const apiKey = userApiKey || (env as any).PERPLEXITY_API_KEY;
     const query = `What are the current trending topics and content themes in the ${niche} niche on Instagram? Focus on: ${keywords.join(", ")}. Return structured data about each trend.`;
 
     const response = await axios.post(
@@ -34,7 +35,7 @@ export const perplexityService = {
       },
       {
         headers: {
-          Authorization: `Bearer ${(env as any).PERPLEXITY_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
       }
@@ -49,7 +50,8 @@ export const perplexityService = {
     }
   },
 
-  async getContentIdeas(niche: string): Promise<ContentIdea[]> {
+  async getContentIdeas(niche: string, userApiKey?: string): Promise<ContentIdea[]> {
+    const apiKey = userApiKey || (env as any).PERPLEXITY_API_KEY;
     const query = `Generate 10 unique Instagram content ideas for the ${niche} niche. Include diverse content formats (Reels, Carousels, Stories, Posts). Return as JSON array with fields: title, description, format.`;
 
     const response = await axios.post(
@@ -67,7 +69,7 @@ export const perplexityService = {
       },
       {
         headers: {
-          Authorization: `Bearer ${(env as any).PERPLEXITY_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
       }
@@ -82,7 +84,7 @@ export const perplexityService = {
     }
   },
 
-  isConfigured(): boolean {
-    return !!(env as any).PERPLEXITY_API_KEY;
+  isConfigured(userApiKey?: string): boolean {
+    return !!(userApiKey || (env as any).PERPLEXITY_API_KEY);
   },
 };

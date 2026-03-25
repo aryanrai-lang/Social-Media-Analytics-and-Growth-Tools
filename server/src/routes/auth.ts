@@ -7,6 +7,8 @@ import {
   logout,
   getMe,
   googleCallback,
+  getApiKeys,
+  updateApiKeys,
 } from "../controllers/authController";
 import { authMiddleware } from "../middleware/authMiddleware";
 
@@ -17,6 +19,8 @@ router.post("/login", login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 router.get("/me", authMiddleware, getMe);
+router.get("/api-keys", authMiddleware, getApiKeys);
+router.put("/api-keys", authMiddleware, updateApiKeys);
 
 router.get(
   "/google",

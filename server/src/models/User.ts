@@ -1,12 +1,20 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
+export interface IUserApiKeys {
+  claudeKey?: string;
+  openaiKey?: string;
+  perplexityKey?: string;
+}
+
 export interface IUser extends Document {
   email: string;
   password?: string;
   name: string;
   googleId?: string;
   avatar?: string;
+  apiKeys?: IUserApiKeys;
+  preferredAiModel?: "gemini" | "claude" | "openai";
   createdAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -17,6 +25,12 @@ const userSchema = new Schema<IUser>({
   name: { type: String, required: true, trim: true },
   googleId: { type: String, unique: true, sparse: true },
   avatar: { type: String },
+  apiKeys: {
+    claudeKey: { type: String, select: false },
+    openaiKey: { type: String, select: false },
+    perplexityKey: { type: String, select: false },
+  },
+  preferredAiModel: { type: String, enum: ["gemini", "claude", "openai"], default: "gemini" },
   createdAt: { type: Date, default: Date.now },
 });
 

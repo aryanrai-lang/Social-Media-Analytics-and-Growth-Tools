@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { workspacesApi, type Workspace } from "@/api/workspaces";
+import { settingsApi, type ApiKeysResponse } from "@/api/settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Trash2, Plus, Save, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Trash2, Plus, Save, Loader2, Key, Brain } from "lucide-react";
 
 const WorkspaceSettings = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +31,15 @@ const WorkspaceSettings = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // API Keys state
+  const [preferredModel, setPreferredModel] = useState<"gemini" | "claude" | "openai">("gemini");
+  const [claudeKey, setClaudeKey] = useState("");
+  const [openaiKey, setOpenaiKey] = useState("");
+  const [perplexityKey, setPerplexityKey] = useState("");
+  const [apiKeysData, setApiKeysData] = useState<ApiKeysResponse | null>(null);
+  const [savingKeys, setSavingKeys] = useState(false);
+  const [keysMessage, setKeysMessage] = useState("");
+
   useEffect(() => {
     if (!id) return;
     workspacesApi.get(id).then((ws) => {
@@ -30,6 +47,10 @@ const WorkspaceSettings = () => {
       setName(ws.name);
       setIgUsername(ws.instagramUsername);
       setLoading(false);
+    });
+    settingsApi.getApiKeys().then((data) => {
+      setApiKeysData(data);
+      setPreferredModel(data.preferredAiModel);
     });
   }, [id]);
 
@@ -74,6 +95,28 @@ const WorkspaceSettings = () => {
     if (!id) return;
     await workspacesApi.delete(id);
     navigate("/workspaces");
+  };
+
+  const handleSaveApiKeys = async () => {
+    setSavingKeys(true);
+    setKeysMessage("");
+    try {
+      const payload: Record<string, string> = { preferredAiModel: preferredModel };
+      if (claudeKey) payload.claudeKey = claudeKey;
+      if (openaiKey) payload.openaiKey = openaiKey;
+      if (perplexityKey) payload.perplexityKey = perplexityKey;
+      await settingsApi.updateApiKeys(payload);
+      setKeysMessage("API keys saved successfully!");
+      setClaudeKey("");
+      setOpenaiKey("");
+      setPerplexityKey("");
+      const updated = await settingsApi.getApiKeys();
+      setApiKeysData(updated);
+    } catch {
+      setKeysMessage("Failed to save API keys.");
+    } finally {
+      setSavingKeys(false);
+    }
   };
 
   if (loading) return null;
@@ -146,6 +189,100 @@ const WorkspaceSettings = () => {
               No competitors added yet.
             </p>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            AI Model & API Keys
+          </CardTitle>
+          <CardDescription>
+            Gemini is the default AI model. Add your own Claude or OpenAI key to use those models instead.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Preferred AI Model</Label>
+            <Select
+              value={preferredModel}
+              onValueChange={(val) => setPreferredModel((val ?? "gemini") as "gemini" | "claude" | "openai")}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gemini">Gemini (Default)</SelectItem>
+                <SelectItem value="claude">Claude</SelectItem>
+                <SelectItem value="openai">OpenAI (GPT)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Claude API Key</Label>
+            <div className="flex items-center gap-2">
+              <Key className="h-4 w-4 text-muted-foreground" />
+              <Input
+                type="password"
+                placeholder={apiKeysData?.hasClaude ? `Current: ${apiKeysData.claudeKey}` : "sk-ant-..."}
+                value={claudeKey}
+                onChange={(e) => setClaudeKey(e.target.value)}
+              />
+            </div>
+            {apiKeysData?.hasClaude && (
+              <p className="text-xs text-muted-foreground">Key is set. Enter a new value to update.</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>OpenAI API Key</Label>
+            <div className="flex items-center gap-2">
+              <Key className="h-4 w-4 text-muted-foreground" />
+              <Input
+                type="password"
+                placeholder={apiKeysData?.hasOpenai ? `Current: ${apiKeysData.openaiKey}` : "sk-..."}
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
+              />
+            </div>
+            {apiKeysData?.hasOpenai && (
+              <p className="text-xs text-muted-foreground">Key is set. Enter a new value to update.</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Perplexity API Key</Label>
+            <div className="flex items-center gap-2">
+              <Key className="h-4 w-4 text-muted-foreground" />
+              <Input
+                type="password"
+                placeholder={apiKeysData?.hasPerplexity ? `Current: ${apiKeysData.perplexityKey}` : "pplx-..."}
+                value={perplexityKey}
+                onChange={(e) => setPerplexityKey(e.target.value)}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {apiKeysData?.hasPerplexity
+                ? "Key is set. Enter a new value to update."
+                : "Optional — enhances trend research results."}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button onClick={handleSaveApiKeys} disabled={savingKeys}>
+              {savingKeys ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save API Keys
+            </Button>
+            {keysMessage && (
+              <span className="text-sm text-muted-foreground">{keysMessage}</span>
+            )}
+          </div>
         </CardContent>
       </Card>
 

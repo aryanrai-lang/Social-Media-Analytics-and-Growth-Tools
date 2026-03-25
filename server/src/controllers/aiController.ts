@@ -6,6 +6,17 @@ import { InstagramPost } from "../models/InstagramPost";
 import { AIGeneration } from "../models/AIGeneration";
 import { analyticsService } from "../services/analyticsService";
 import { aiService } from "../services/aiService";
+import { User } from "../models/User";
+import { AiModelType, getModelDisplayName } from "../services/multiModelService";
+
+async function getUserAiOptions(userId: string) {
+  const user = await User.findById(userId).select("+apiKeys.claudeKey +apiKeys.openaiKey +apiKeys.perplexityKey");
+  const model: AiModelType = user?.preferredAiModel || "gemini";
+  let apiKey: string | undefined;
+  if (model === "claude") apiKey = user?.apiKeys?.claudeKey;
+  else if (model === "openai") apiKey = user?.apiKeys?.openaiKey;
+  return { model, apiKey };
+}
 
 async function getWorkspaceAnalyticsData(workspaceId: string, userId: string) {
   console.log("[AI Controller] Getting analytics data for workspace:", workspaceId, "user:", userId);
@@ -56,12 +67,14 @@ export const generateGapAnalysis = async (req: AuthRequest, res: Response): Prom
   try {
     console.log("[AI Controller] generateGapAnalysis called, workspace:", req.params.id);
 
-    if (!aiService.isConfigured()) {
+    const aiOptions = await getUserAiOptions(req.userId!);
+    console.log("[AI Controller] Using model:", aiOptions.model);
+
+    if (!aiService.isConfigured(aiOptions.apiKey, aiOptions.model)) {
       console.log("[AI Controller] AI service NOT configured");
-      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY." });
+      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY or add your API key in Settings." });
       return;
     }
-    console.log("[AI Controller] AI service is configured");
 
     const data = await getWorkspaceAnalyticsData(req.params.id, req.userId!);
     if (!data) {
@@ -70,23 +83,23 @@ export const generateGapAnalysis = async (req: AuthRequest, res: Response): Prom
       return;
     }
 
-    console.log("[AI Controller] Calling Gemini...");
+    console.log("[AI Controller] Calling", aiOptions.model, "...");
     const output = await aiService.generateGapAnalysis(
       data.ownerProfile.username,
       data.ownerAnalytics,
       data.gaps,
-      data.competitorData
+      data.competitorData,
+      aiOptions
     );
-    console.log("[AI Controller] Gemini output:", JSON.stringify(output).substring(0, 200));
+    console.log("[AI Controller] AI output:", JSON.stringify(output).substring(0, 200));
 
     const generation = await AIGeneration.create({
       workspaceId: data.workspace._id,
       type: "gap_analysis",
       input: { ownerAnalytics: data.ownerAnalytics, gaps: data.gaps },
       output,
-      aiModel: "gemini-2.5-flash",
+      aiModel: getModelDisplayName(aiOptions.model),
     });
-    console.log("[AI Controller] Saved to DB, id:", generation._id);
 
     res.json(generation);
   } catch (error: any) {
@@ -97,8 +110,10 @@ export const generateGapAnalysis = async (req: AuthRequest, res: Response): Prom
 
 export const generateContentPlan = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!aiService.isConfigured()) {
-      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY." });
+    const aiOptions = await getUserAiOptions(req.userId!);
+
+    if (!aiService.isConfigured(aiOptions.apiKey, aiOptions.model)) {
+      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY or add your API key in Settings." });
       return;
     }
 
@@ -114,7 +129,8 @@ export const generateContentPlan = async (req: AuthRequest, res: Response): Prom
       data.ownerAnalytics,
       data.gaps,
       trends,
-      period
+      period,
+      aiOptions
     );
 
     const generation = await AIGeneration.create({
@@ -122,7 +138,7 @@ export const generateContentPlan = async (req: AuthRequest, res: Response): Prom
       type: "content_plan",
       input: { ownerAnalytics: data.ownerAnalytics, gaps: data.gaps, trends, period },
       output,
-      aiModel: "gemini-2.5-flash",
+      aiModel: getModelDisplayName(aiOptions.model),
     });
 
     res.json(generation);
@@ -133,8 +149,10 @@ export const generateContentPlan = async (req: AuthRequest, res: Response): Prom
 
 export const generateGrowthStrategy = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!aiService.isConfigured()) {
-      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY." });
+    const aiOptions = await getUserAiOptions(req.userId!);
+
+    if (!aiService.isConfigured(aiOptions.apiKey, aiOptions.model)) {
+      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY or add your API key in Settings." });
       return;
     }
 
@@ -148,7 +166,8 @@ export const generateGrowthStrategy = async (req: AuthRequest, res: Response): P
       data.ownerProfile.username,
       data.ownerAnalytics,
       data.gaps,
-      data.competitorData.length
+      data.competitorData.length,
+      aiOptions
     );
 
     const generation = await AIGeneration.create({
@@ -156,7 +175,7 @@ export const generateGrowthStrategy = async (req: AuthRequest, res: Response): P
       type: "growth_strategy",
       input: { ownerAnalytics: data.ownerAnalytics, gaps: data.gaps },
       output,
-      aiModel: "gemini-2.5-flash",
+      aiModel: getModelDisplayName(aiOptions.model),
     });
 
     res.json(generation);
@@ -167,8 +186,10 @@ export const generateGrowthStrategy = async (req: AuthRequest, res: Response): P
 
 export const generateContentIdeas = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!aiService.isConfigured()) {
-      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY." });
+    const aiOptions = await getUserAiOptions(req.userId!);
+
+    if (!aiService.isConfigured(aiOptions.apiKey, aiOptions.model)) {
+      res.status(400).json({ message: "AI service not configured. Set GEMINI_API_KEY or add your API key in Settings." });
       return;
     }
 
@@ -183,7 +204,8 @@ export const generateContentIdeas = async (req: AuthRequest, res: Response): Pro
       data.ownerProfile.username,
       niche,
       data.ownerAnalytics,
-      trends
+      trends,
+      aiOptions
     );
 
     const generation = await AIGeneration.create({
@@ -191,7 +213,7 @@ export const generateContentIdeas = async (req: AuthRequest, res: Response): Pro
       type: "content_ideas",
       input: { niche, trends },
       output,
-      aiModel: "gemini-2.5-flash",
+      aiModel: getModelDisplayName(aiOptions.model),
     });
 
     res.json(generation);
