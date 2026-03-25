@@ -31,7 +31,7 @@ const ContentPlan = () => {
     setLoading(true);
     try {
       const res = await aiApi.contentPlan(id, period);
-      setPlan(res.result);
+      setPlan(res.output);
     } catch {
       // handle
     } finally {

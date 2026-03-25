@@ -27,14 +27,17 @@ const AIInsights = () => {
   const [contentIdeas, setContentIdeas] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
 
-  const handleGapAnalysis = async () => {
+    const handleGapAnalysis = async () => {
     if (!id) return;
     setLoading("gap");
     try {
+      console.log("[AI] Calling gapAnalysis for workspace:", id);
       const res = await aiApi.gapAnalysis(id);
-      setGapAnalysis(res.result);
-    } catch {
-      // handle
+      console.log("[AI] Gap analysis full response:", res);
+      console.log("[AI] Gap analysis output:", res.output);
+      setGapAnalysis(res.output);
+    } catch (err: any) {
+      console.error("[AI] Gap analysis error:", err?.response?.data || err.message || err);
     } finally {
       setLoading(null);
     }
@@ -44,10 +47,12 @@ const AIInsights = () => {
     if (!id) return;
     setLoading("growth");
     try {
+      console.log("[AI] Calling growthStrategy for workspace:", id);
       const res = await aiApi.growthStrategy(id);
-      setGrowthStrategy(res.result);
-    } catch {
-      // handle
+      console.log("[AI] Growth strategy full response:", res);
+      setGrowthStrategy(res.output);
+    } catch (err: any) {
+      console.error("[AI] Growth strategy error:", err?.response?.data || err.message || err);
     } finally {
       setLoading(null);
     }
@@ -57,10 +62,12 @@ const AIInsights = () => {
     if (!id) return;
     setLoading("ideas");
     try {
+      console.log("[AI] Calling contentIdeas for workspace:", id);
       const res = await aiApi.contentIdeas(id, "general");
-      setContentIdeas(res.result);
-    } catch {
-      // handle
+      console.log("[AI] Content ideas full response:", res);
+      setContentIdeas(res.output);
+    } catch (err: any) {
+      console.error("[AI] Content ideas error:", err?.response?.data || err.message || err);
     } finally {
       setLoading(null);
     }

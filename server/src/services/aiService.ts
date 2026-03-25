@@ -2,9 +2,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "../config/env";
 import { ProfileAnalytics, GapItem } from "./analyticsService";
 
-const genAI = new GoogleGenerativeAI((env as any).GEMINI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY || "");
 
-const getModel = () => genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const getModel = () => genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export const aiService = {
   async generateGapAnalysis(
@@ -201,6 +201,6 @@ Return ONLY valid JSON, no markdown.`;
   },
 
   isConfigured(): boolean {
-    return !!(env as any).GEMINI_API_KEY;
+    return !!env.GEMINI_API_KEY;
   },
 };
