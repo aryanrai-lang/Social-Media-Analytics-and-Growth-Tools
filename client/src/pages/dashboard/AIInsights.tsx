@@ -1,21 +1,14 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { aiApi } from "@/api/ai";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Lightbulb,
-  TrendingUp,
-  Target,
-  Sparkles,
-  Loader2,
-} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Target, TrendingUp, Lightbulb, Sparkles, Loader2 } from "lucide-react";
+import { GapAnalysisView } from "@/components/dashboard/GapAnalysisView";
+import { GrowthStrategyView } from "@/components/dashboard/GrowthStrategyView";
+import { ContentIdeasView } from "@/components/dashboard/ContentIdeasView";
+import { EmptyState } from "@/components/dashboard/EmptyState";
 
 const AIInsights = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,17 +17,14 @@ const AIInsights = () => {
   const [contentIdeas, setContentIdeas] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
 
-    const handleGapAnalysis = async () => {
+  const handleGapAnalysis = async () => {
     if (!id) return;
     setLoading("gap");
     try {
-      console.log("[AI] Calling gapAnalysis for workspace:", id);
       const res = await aiApi.gapAnalysis(id);
-      console.log("[AI] Gap analysis full response:", res);
-      console.log("[AI] Gap analysis output:", res.output);
       setGapAnalysis(res.output);
     } catch (err: any) {
-      console.error("[AI] Gap analysis error:", err?.response?.data || err.message || err);
+      console.error("[AI] Gap analysis error:", err?.response?.data || err.message);
     } finally {
       setLoading(null);
     }
@@ -44,12 +34,10 @@ const AIInsights = () => {
     if (!id) return;
     setLoading("growth");
     try {
-      console.log("[AI] Calling growthStrategy for workspace:", id);
       const res = await aiApi.growthStrategy(id);
-      console.log("[AI] Growth strategy full response:", res);
       setGrowthStrategy(res.output);
     } catch (err: any) {
-      console.error("[AI] Growth strategy error:", err?.response?.data || err.message || err);
+      console.error("[AI] Growth strategy error:", err?.response?.data || err.message);
     } finally {
       setLoading(null);
     }
@@ -59,70 +47,14 @@ const AIInsights = () => {
     if (!id) return;
     setLoading("ideas");
     try {
-      console.log("[AI] Calling contentIdeas for workspace:", id);
       const res = await aiApi.contentIdeas(id, "general");
-      console.log("[AI] Content ideas full response:", res);
       setContentIdeas(res.output);
     } catch (err: any) {
-      console.error("[AI] Content ideas error:", err?.response?.data || err.message || err);
+      console.error("[AI] Content ideas error:", err?.response?.data || err.message);
     } finally {
       setLoading(null);
     }
   };
-
-  const ActionCard = ({
-    title,
-    description,
-    icon: Icon,
-    action,
-    loadingKey,
-    result,
-  }: {
-    title: string;
-    description: string;
-    icon: any;
-    action: () => void;
-    loadingKey: string;
-    result: any;
-  }) => (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base">{title}</CardTitle>
-          </div>
-          <Button
-            size="sm"
-            onClick={action}
-            disabled={loading !== null}
-          >
-            {loading === loadingKey ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4 mr-1" />
-                Generate
-              </>
-            )}
-          </Button>
-        </div>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      {result && (
-        <CardContent>
-          <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap">
-            {typeof result === "string"
-              ? result
-              : JSON.stringify(result, null, 2)}
-          </div>
-        </CardContent>
-      )}
-    </Card>
-  );
 
   return (
     <div className="space-y-6">
@@ -133,32 +65,155 @@ const AIInsights = () => {
         </p>
       </div>
 
-      <div className="space-y-4">
-        <ActionCard
-          title="Gap Analysis"
-          description="Identify gaps between your account and competitors using AI"
-          icon={Target}
-          action={handleGapAnalysis}
-          loadingKey="gap"
-          result={gapAnalysis}
-        />
-        <ActionCard
-          title="Growth Strategy"
-          description="Get personalized growth recommendations based on your data"
-          icon={TrendingUp}
-          action={handleGrowthStrategy}
-          loadingKey="growth"
-          result={growthStrategy}
-        />
-        <ActionCard
-          title="Content Ideas"
-          description="Generate fresh content ideas based on trends and performance"
-          icon={Lightbulb}
-          action={handleContentIdeas}
-          loadingKey="ideas"
-          result={contentIdeas}
-        />
-      </div>
+      <Tabs defaultValue={0}>
+        <TabsList>
+          <TabsTrigger value={0}>
+            <Target className="h-4 w-4" />
+            Gap Analysis
+          </TabsTrigger>
+          <TabsTrigger value={1}>
+            <TrendingUp className="h-4 w-4" />
+            Growth Strategy
+          </TabsTrigger>
+          <TabsTrigger value={2}>
+            <Lightbulb className="h-4 w-4" />
+            Content Ideas
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Gap Analysis Tab */}
+        <TabsContent value={0}>
+          <div className="space-y-4 pt-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h2 className="font-semibold">Gap Analysis</h2>
+                <p className="text-sm text-muted-foreground">
+                  Identify gaps between your account and competitors
+                </p>
+              </div>
+              <Button onClick={handleGapAnalysis} disabled={loading !== null}>
+                {loading === "gap" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {loading === "gap" ? (
+              <div className="space-y-4">
+                <Skeleton className="h-24 w-full rounded-xl" />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Skeleton className="h-48 rounded-xl" />
+                  <Skeleton className="h-48 rounded-xl" />
+                </div>
+              </div>
+            ) : gapAnalysis ? (
+              <GapAnalysisView data={gapAnalysis} />
+            ) : (
+              <EmptyState
+                icon={Target}
+                description="Analyze gaps between your account and competitors"
+              />
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Growth Strategy Tab */}
+        <TabsContent value={1}>
+          <div className="space-y-4 pt-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h2 className="font-semibold">Growth Strategy</h2>
+                <p className="text-sm text-muted-foreground">
+                  Get personalized growth recommendations
+                </p>
+              </div>
+              <Button
+                onClick={handleGrowthStrategy}
+                disabled={loading !== null}
+              >
+                {loading === "growth" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Strategizing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {loading === "growth" ? (
+              <div className="space-y-4">
+                <Skeleton className="h-24 w-full rounded-xl" />
+                <Skeleton className="h-64 w-full rounded-xl" />
+              </div>
+            ) : growthStrategy ? (
+              <GrowthStrategyView data={growthStrategy} />
+            ) : (
+              <EmptyState
+                icon={TrendingUp}
+                description="Get AI-powered growth strategy and action plan"
+              />
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Content Ideas Tab */}
+        <TabsContent value={2}>
+          <div className="space-y-4 pt-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h2 className="font-semibold">Content Ideas</h2>
+                <p className="text-sm text-muted-foreground">
+                  Fresh content ideas based on trends and performance
+                </p>
+              </div>
+              <Button
+                onClick={handleContentIdeas}
+                disabled={loading !== null}
+              >
+                {loading === "ideas" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {loading === "ideas" ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-52 rounded-xl" />
+                ))}
+              </div>
+            ) : contentIdeas ? (
+              <ContentIdeasView data={contentIdeas} />
+            ) : (
+              <EmptyState
+                icon={Lightbulb}
+                description="Generate fresh content ideas based on trends"
+              />
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

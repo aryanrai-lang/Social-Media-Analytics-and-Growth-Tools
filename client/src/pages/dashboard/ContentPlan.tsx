@@ -17,12 +17,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarDays, Sparkles, Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  CalendarDays,
+  Sparkles,
+  Loader2,
+  Clock,
+  Target,
+  TrendingUp,
+} from "lucide-react";
+import { ContentTypeBadge } from "@/components/dashboard/ContentTypeBadge";
+import { CollapsibleSection } from "@/components/dashboard/CollapsibleSection";
+import { EmptyState } from "@/components/dashboard/EmptyState";
+
+interface Post {
+  time: string;
+  type: string;
+  topic: string;
+  caption: string;
+  rationale: string;
+}
+
+interface Day {
+  day: number;
+  date: string;
+  posts: Post[];
+}
+
+interface PlanData {
+  planName?: string;
+  period?: string;
+  days?: Day[];
+  overallStrategy?: string;
+  expectedOutcome?: string;
+}
 
 const ContentPlan = () => {
   const { id } = useParams<{ id: string }>();
   const [period, setPeriod] = useState("weekly");
-  const [plan, setPlan] = useState<any>(null);
+  const [plan, setPlan] = useState<PlanData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleGenerate = async () => {
@@ -60,14 +93,16 @@ const ContentPlan = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3">
-            <Select value={period} onValueChange={(val) => setPeriod(val ?? "weekly")}>
+            <Select
+              value={period}
+              onValueChange={(val) => setPeriod(val ?? "weekly")}
+            >
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="daily">Daily</SelectItem>
                 <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={handleGenerate} disabled={loading}>
@@ -87,23 +122,127 @@ const ContentPlan = () => {
         </CardContent>
       </Card>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="space-y-4">
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-60 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Result */}
-      {plan && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Your Content Plan</CardTitle>
-              <Badge>{period}</Badge>
+      {!loading && plan && (
+        <div className="space-y-6">
+          {/* Strategy Banner */}
+          {(plan.overallStrategy || plan.expectedOutcome) && (
+            <Card className="border-l-4 border-l-primary bg-primary/5">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <Target className="h-5 w-5 text-primary shrink-0" />
+                  <h2 className="font-bold text-lg">
+                    {plan.planName || "Content Plan"}
+                  </h2>
+                  {plan.period && (
+                    <Badge variant="secondary">{plan.period}</Badge>
+                  )}
+                </div>
+                {plan.overallStrategy && (
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {plan.overallStrategy}
+                  </p>
+                )}
+                {plan.expectedOutcome && (
+                  <div className="flex items-start gap-2 mt-3 rounded-lg bg-green-50 dark:bg-green-950/30 px-3 py-2">
+                    <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                      {plan.expectedOutcome}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Daily Schedule */}
+          {plan.days && plan.days.length > 0 && (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {plan.days.map((day, i) => (
+                <Card
+                  key={i}
+                  className="hover:shadow-md transition-shadow duration-200"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <CalendarDays className="h-4 w-4 text-primary" />
+                        {day.date || `Day ${day.day}`}
+                      </CardTitle>
+                      <Badge variant="secondary" className="text-xs">
+                        {day.posts?.length || 0} post
+                        {(day.posts?.length || 0) !== 1 ? "s" : ""}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {day.posts?.map((post, j) => (
+                        <div
+                          key={j}
+                          className="rounded-lg border p-3 space-y-2 hover:bg-muted/50 transition-colors"
+                        >
+                          {/* Time + Type */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {post.time}
+                            </div>
+                            <ContentTypeBadge type={post.type} />
+                          </div>
+
+                          {/* Topic */}
+                          <p className="font-medium text-sm">{post.topic}</p>
+
+                          {/* Caption */}
+                          {post.caption && (
+                            <CollapsibleSection title="Caption">
+                              <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                                {post.caption}
+                              </p>
+                            </CollapsibleSection>
+                          )}
+
+                          {/* Rationale */}
+                          {post.rationale && (
+                            <CollapsibleSection title="Why this post">
+                              <div className="rounded-md bg-muted/50 px-2.5 py-1.5">
+                                <p className="text-xs text-muted-foreground">
+                                  {post.rationale}
+                                </p>
+                              </div>
+                            </CollapsibleSection>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap">
-              {typeof plan === "string"
-                ? plan
-                : JSON.stringify(plan, null, 2)}
-            </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !plan && (
+        <EmptyState
+          icon={CalendarDays}
+          title="No content plan yet"
+          description="Generate an AI-powered content calendar for your Instagram"
+        />
       )}
     </div>
   );
