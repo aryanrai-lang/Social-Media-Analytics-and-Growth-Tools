@@ -105,7 +105,11 @@ const ContentPlan = () => {
                 <SelectItem value="weekly">Weekly</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={handleGenerate} disabled={loading}>
+            <Button
+              onClick={handleGenerate}
+              disabled={loading}
+              className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-md"
+            >
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -125,10 +129,10 @@ const ContentPlan = () => {
       {/* Loading State */}
       {loading && (
         <div className="space-y-4">
-          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl shimmer-bg" />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-60 rounded-xl" />
+              <Skeleton key={i} className="h-60 rounded-xl shimmer-bg" />
             ))}
           </div>
         </div>
@@ -139,7 +143,7 @@ const ContentPlan = () => {
         <div className="space-y-6">
           {/* Strategy Banner */}
           {(plan.overallStrategy || plan.expectedOutcome) && (
-            <Card className="border-l-4 border-l-primary bg-primary/5">
+            <Card className="relative overflow-hidden border-t-2 border-t-primary shadow-primary/10 shadow-lg bg-gradient-to-br from-primary/5 to-transparent">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <Target className="h-5 w-5 text-primary shrink-0" />
@@ -156,9 +160,9 @@ const ContentPlan = () => {
                   </p>
                 )}
                 {plan.expectedOutcome && (
-                  <div className="flex items-start gap-2 mt-3 rounded-lg bg-green-50 dark:bg-green-950/30 px-3 py-2">
-                    <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-                    <p className="text-sm text-green-700 dark:text-green-300">
+                  <div className="flex items-start gap-2 mt-3 rounded-lg bg-green-50 px-3 py-2">
+                    <TrendingUp className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                    <p className="text-sm text-green-700">
                       {plan.expectedOutcome}
                     </p>
                   </div>
@@ -173,12 +177,15 @@ const ContentPlan = () => {
               {plan.days.map((day, i) => (
                 <Card
                   key={i}
-                  className="hover:shadow-md transition-shadow duration-200"
+                  className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden animate-fade-in-up"
+                  style={{ animationDelay: `${i * 80}ms` }}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4 text-primary" />
+                        <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary to-violet-500 flex items-center justify-center text-white text-xs font-bold">
+                          {day.day || i + 1}
+                        </div>
                         {day.date || `Day ${day.day}`}
                       </CardTitle>
                       <Badge variant="secondary" className="text-xs">

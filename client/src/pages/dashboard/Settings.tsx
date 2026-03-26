@@ -287,7 +287,7 @@ const WorkspaceSettings = () => {
       </Card>
 
       <div className="flex items-center justify-between">
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90 active:scale-[0.98] transition-all duration-200">
           {saving ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (
@@ -295,7 +295,7 @@ const WorkspaceSettings = () => {
           )}
           Save Changes
         </Button>
-        <Button variant="destructive" onClick={handleDelete}>
+        <Button variant="destructive" onClick={handleDelete} className="active:scale-[0.98] transition-transform">
           <Trash2 className="h-4 w-4 mr-2" />
           Delete Workspace
         </Button>

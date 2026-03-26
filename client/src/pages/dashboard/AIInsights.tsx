@@ -56,6 +56,26 @@ const AIInsights = () => {
     }
   };
 
+  const generateBtn = (onClick: () => void, loadingKey: string, loadingText: string) => (
+    <Button
+      onClick={onClick}
+      disabled={loading !== null}
+      className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-md"
+    >
+      {loading === loadingKey ? (
+        <>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          {loadingText}
+        </>
+      ) : (
+        <>
+          <Sparkles className="h-4 w-4 mr-2" />
+          Generate
+        </>
+      )}
+    </Button>
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -91,27 +111,15 @@ const AIInsights = () => {
                   Identify gaps between your account and competitors
                 </p>
               </div>
-              <Button onClick={handleGapAnalysis} disabled={loading !== null}>
-                {loading === "gap" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate
-                  </>
-                )}
-              </Button>
+              {generateBtn(handleGapAnalysis, "gap", "Analyzing...")}
             </div>
 
             {loading === "gap" ? (
               <div className="space-y-4">
-                <Skeleton className="h-24 w-full rounded-xl" />
+                <Skeleton className="h-24 w-full rounded-xl shimmer-bg" />
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Skeleton className="h-48 rounded-xl" />
-                  <Skeleton className="h-48 rounded-xl" />
+                  <Skeleton className="h-48 rounded-xl shimmer-bg" />
+                  <Skeleton className="h-48 rounded-xl shimmer-bg" />
                 </div>
               </div>
             ) : gapAnalysis ? (
@@ -135,28 +143,13 @@ const AIInsights = () => {
                   Get personalized growth recommendations
                 </p>
               </div>
-              <Button
-                onClick={handleGrowthStrategy}
-                disabled={loading !== null}
-              >
-                {loading === "growth" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Strategizing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate
-                  </>
-                )}
-              </Button>
+              {generateBtn(handleGrowthStrategy, "growth", "Strategizing...")}
             </div>
 
             {loading === "growth" ? (
               <div className="space-y-4">
-                <Skeleton className="h-24 w-full rounded-xl" />
-                <Skeleton className="h-64 w-full rounded-xl" />
+                <Skeleton className="h-24 w-full rounded-xl shimmer-bg" />
+                <Skeleton className="h-64 w-full rounded-xl shimmer-bg" />
               </div>
             ) : growthStrategy ? (
               <GrowthStrategyView data={growthStrategy} />
@@ -179,28 +172,13 @@ const AIInsights = () => {
                   Fresh content ideas based on trends and performance
                 </p>
               </div>
-              <Button
-                onClick={handleContentIdeas}
-                disabled={loading !== null}
-              >
-                {loading === "ideas" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate
-                  </>
-                )}
-              </Button>
+              {generateBtn(handleContentIdeas, "ideas", "Generating...")}
             </div>
 
             {loading === "ideas" ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-52 rounded-xl" />
+                  <Skeleton key={i} className="h-52 rounded-xl shimmer-bg" />
                 ))}
               </div>
             ) : contentIdeas ? (

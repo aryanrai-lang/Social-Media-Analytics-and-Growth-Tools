@@ -5,17 +5,8 @@ import GoogleLoginButton from "@/components/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { BarChart3 } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { BarChart3, TrendingUp, Shield, Zap } from "lucide-react";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -45,88 +36,137 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <nav className="flex items-center justify-between px-6 py-3 border-b bg-card">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5 text-primary" />
-          <span className="font-semibold text-sm">Social Analytics</span>
+    <div className="grid min-h-screen md:grid-cols-2">
+      {/* Left — Branding Panel */}
+      <div className="hidden md:flex flex-col justify-between bg-gradient-to-br from-violet-600 via-primary/90 to-primary p-10 text-white relative overflow-hidden">
+        {/* Floating decoration */}
+        <div className="absolute top-1/3 -right-24 h-72 w-72 rounded-full bg-white/10 animate-float" />
+        <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/5 animate-float" style={{ animationDelay: '2s' }} />
+
+        <div className="flex items-center gap-3 z-10">
+          <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
+            <BarChart3 className="h-6 w-6" />
+          </div>
+          <span className="text-xl font-bold tracking-tight">Social Analytics</span>
         </div>
-        <ThemeToggle />
-      </nav>
-      <div className="flex-1 flex items-center justify-center p-4">
-      <Card className="w-full max-w-[420px]">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-          <CardDescription>Join the community</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
-              {error}
-            </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="John Doe"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                placeholder="••••••••"
-              />
-            </div>
-
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account..." : "Sign Up"}
-            </Button>
-          </form>
-
-          <div className="relative my-6">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-              or
-            </span>
+        <div className="z-10 space-y-8">
+          <div>
+            <h1 className="text-4xl font-extrabold leading-tight">Start your growth<br />journey today</h1>
+            <p className="mt-3 text-lg text-white/80 max-w-md">
+              Join thousands of creators and brands using AI-powered insights to dominate Instagram.
+            </p>
           </div>
 
-          <GoogleLoginButton />
-        </CardContent>
-        <CardFooter className="justify-center">
-          <p className="text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
+          <div className="space-y-4">
+            {[
+              { icon: TrendingUp, text: "Track follower growth in real-time" },
+              { icon: Shield, text: "Benchmark against top competitors" },
+              { icon: Zap, text: "Get AI content recommendations" },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-3">
+                <div className="rounded-lg bg-white/15 p-2">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-medium text-white/90">{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-xs text-white/50 z-10">© 2026 Social Analytics. All rights reserved.</p>
+      </div>
+
+      {/* Right — Form Panel */}
+      <div className="flex flex-col bg-background relative">
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="w-full max-w-[400px] space-y-6 animate-fade-in-up">
+            {/* Mobile logo */}
+            <div className="flex items-center gap-2 md:hidden mb-4">
+              <div className="rounded-xl bg-gradient-to-br from-violet-500 to-primary p-2">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-lg">Social Analytics</span>
+            </div>
+
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Create account</h2>
+              <p className="text-muted-foreground mt-1">Join the community and start growing</p>
+            </div>
+
+            {error && (
+              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  placeholder="John Doe"
+                  className="h-11 transition-shadow duration-200 focus:shadow-md"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="you@example.com"
+                  className="h-11 transition-shadow duration-200 focus:shadow-md"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  className="h-11 transition-shadow duration-200 focus:shadow-md"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-11 bg-gradient-to-r from-violet-600 to-primary text-white hover:opacity-90 active:scale-[0.98] transition-all duration-200"
+                disabled={loading}
+              >
+                {loading ? "Creating account..." : "Sign Up"}
+              </Button>
+            </form>
+
+            <div className="relative">
+              <Separator />
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground">
+                or
+              </span>
+            </div>
+
+            <GoogleLoginButton />
+
+            <p className="text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link to="/login" className="text-primary font-medium hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

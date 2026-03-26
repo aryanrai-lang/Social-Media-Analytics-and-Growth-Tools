@@ -45,7 +45,7 @@ export function GrowthStrategyView({ data }: { data: GrowthStrategyData }) {
     <div className="space-y-6">
       {/* Hero */}
       {(data.strategyName || data.overallGoal) && (
-        <Card className="border-l-4 border-l-primary bg-gradient-to-br from-primary/5 to-transparent">
+        <Card className="relative overflow-hidden border-t-2 border-t-primary shadow-primary/10 shadow-lg bg-gradient-to-br from-primary/5 to-transparent">
           <CardContent className="pt-6">
             {data.strategyName && (
               <div className="flex items-center gap-2 mb-2">
@@ -69,16 +69,16 @@ export function GrowthStrategyView({ data }: { data: GrowthStrategyData }) {
             Phases
           </h3>
           <div className="relative ml-4">
-            {/* Timeline line */}
-            <div className="absolute left-0 top-3 bottom-3 w-0.5 bg-border" />
+            {/* Gradient timeline line */}
+            <div className="absolute left-0 top-3 bottom-3 w-0.5 bg-gradient-to-b from-primary to-violet-500" />
 
             <div className="space-y-6">
               {data.phases.map((phase, i) => (
                 <div key={i} className="relative pl-8">
                   {/* Timeline dot */}
-                  <div className="absolute left-[-5px] top-2 h-3 w-3 rounded-full border-2 border-primary bg-background z-10" />
+                  <div className={`absolute left-[-5px] top-2 h-3 w-3 rounded-full border-2 border-primary bg-background z-10 ${i === 0 ? 'animate-pulse-glow' : ''}`} />
 
-                  <Card className="hover:shadow-md transition-shadow duration-200">
+                  <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: `${i * 150}ms` }}>
                     <CardHeader className="pb-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <CardTitle className="text-base">
@@ -147,9 +147,10 @@ export function GrowthStrategyView({ data }: { data: GrowthStrategyData }) {
             {data.kpis.map((kpi, i) => (
               <Card
                 key={i}
-                className="hover:shadow-md transition-shadow duration-200"
+                className="relative overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
-                <CardContent className="pt-4">
+                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary to-violet-500" />
+                <CardContent className="pt-5">
                   <p className="text-xs font-medium text-muted-foreground mb-2">
                     {kpi.metric}
                   </p>
@@ -174,9 +175,9 @@ export function GrowthStrategyView({ data }: { data: GrowthStrategyData }) {
 
       {/* Do Not */}
       {data.doNot && data.doNot.length > 0 && (
-        <Card className="border-red-200 dark:border-red-800">
+        <Card className="border-red-200">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2 text-red-600 dark:text-red-400">
+            <CardTitle className="text-sm flex items-center gap-2 text-red-600">
               <AlertTriangle className="h-4 w-4" />
               Avoid These Mistakes
             </CardTitle>

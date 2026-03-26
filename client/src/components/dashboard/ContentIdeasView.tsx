@@ -24,10 +24,10 @@ interface ContentIdeasData {
 }
 
 const engagementConfig: Record<string, string> = {
-  high: "bg-green-100 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800",
+  high: "bg-green-100 text-green-700 border-green-200",
   medium:
-    "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800",
-  low: "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700",
+    "bg-amber-100 text-amber-700 border-amber-200",
+  low: "bg-gray-100 text-gray-600 border-gray-200",
 };
 
 const contentTypes = ["all", "reel", "carousel", "image", "story"];
@@ -59,9 +59,9 @@ export function ContentIdeasView({ data }: { data: ContentIdeasData }) {
               type="button"
               onClick={() => setFilter(type)}
               className={cn(
-                "inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                "inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
                 filter === type
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-gradient-to-r from-primary to-violet-500 text-white shadow-sm"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
               )}
             >
@@ -76,7 +76,8 @@ export function ContentIdeasView({ data }: { data: ContentIdeasData }) {
         {filteredIdeas.map((idea, i) => (
           <Card
             key={i}
-            className="hover:shadow-md transition-shadow duration-200"
+            className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 animate-fade-in-up"
+            style={{ animationDelay: `${i * 80}ms` }}
           >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-2">

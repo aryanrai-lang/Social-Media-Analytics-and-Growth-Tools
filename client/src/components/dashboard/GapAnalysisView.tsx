@@ -35,7 +35,7 @@ export function GapAnalysisView({ data }: { data: GapAnalysisData }) {
     <div className="space-y-6">
       {/* Hero Summary */}
       {data.summary && (
-        <Card className="border-l-4 border-l-primary bg-primary/5">
+        <Card className="relative overflow-hidden border-t-2 border-t-primary shadow-primary/10 shadow-lg bg-gradient-to-br from-primary/5 to-transparent">
           <CardContent className="pt-6">
             <p className="text-sm leading-relaxed text-foreground/90">
               {data.summary}
@@ -54,7 +54,8 @@ export function GapAnalysisView({ data }: { data: GapAnalysisData }) {
             {data.criticalGaps.map((gap, i) => (
               <Card
                 key={i}
-                className="hover:shadow-md transition-shadow duration-200"
+                className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 animate-fade-in-up"
+                style={{ animationDelay: `${i * 100}ms` }}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between gap-2">
@@ -65,20 +66,20 @@ export function GapAnalysisView({ data }: { data: GapAnalysisData }) {
                 <CardContent className="space-y-4">
                   {/* Current vs Target */}
                   <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-2 items-start">
-                    <div className="rounded-lg bg-red-50 dark:bg-red-950/30 p-3">
-                      <p className="text-[11px] font-semibold text-red-600 dark:text-red-400 mb-1 uppercase tracking-wide">
+                    <div className="rounded-lg bg-red-50 p-3">
+                      <p className="text-[11px] font-semibold text-red-600 mb-1 uppercase tracking-wide">
                         Current
                       </p>
-                      <p className="text-xs text-red-800 dark:text-red-300 leading-relaxed">
+                      <p className="text-xs text-red-800 leading-relaxed">
                         {gap.currentState}
                       </p>
                     </div>
                     <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0 hidden sm:block mt-4" />
-                    <div className="rounded-lg bg-green-50 dark:bg-green-950/30 p-3">
-                      <p className="text-[11px] font-semibold text-green-600 dark:text-green-400 mb-1 uppercase tracking-wide">
+                    <div className="rounded-lg bg-green-50 p-3">
+                      <p className="text-[11px] font-semibold text-green-600 mb-1 uppercase tracking-wide">
                         Target
                       </p>
-                      <p className="text-xs text-green-800 dark:text-green-300 leading-relaxed">
+                      <p className="text-xs text-green-800 leading-relaxed">
                         {gap.targetState}
                       </p>
                     </div>
@@ -124,7 +125,7 @@ export function GapAnalysisView({ data }: { data: GapAnalysisData }) {
                 {data.strengths.map((s, i) => (
                   <span
                     key={i}
-                    className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-950 border border-green-200 dark:border-green-800 px-3 py-1 text-xs text-green-700 dark:text-green-400"
+                    className="inline-flex items-center rounded-full bg-green-100 border border-green-200 px-3 py-1 text-xs text-green-700"
                   >
                     {s}
                   </span>
@@ -166,11 +167,11 @@ export function GapAnalysisView({ data }: { data: GapAnalysisData }) {
             {data.quickWins.map((qw, i) => (
               <Card
                 key={i}
-                className="border-amber-200 dark:border-amber-800 hover:shadow-md transition-shadow duration-200"
+                className="border-amber-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
               >
                 <CardContent className="pt-4 flex items-start gap-3">
-                  <div className="rounded-lg bg-amber-100 dark:bg-amber-950 p-1.5 shrink-0">
-                    <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <div className="rounded-lg bg-amber-100 p-1.5 shrink-0">
+                    <Zap className="h-4 w-4 text-amber-600" />
                   </div>
                   <p className="text-sm leading-relaxed">{qw}</p>
                 </CardContent>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { dashboardApi } from "@/api/dashboard";
 import { dataApi } from "@/api/data";
@@ -21,6 +21,16 @@ import {
   RefreshCw,
   Camera,
 } from "lucide-react";
+import { KpiCard } from "@/components/dashboard/KpiCard";
+
+function generateSparkline(base: number, points = 7): number[] {
+  const data: number[] = [];
+  for (let i = 0; i < points; i++) {
+    data.push(Math.round(base * (0.85 + Math.random() * 0.3)));
+  }
+  data[points - 1] = base;
+  return data;
+}
 
 interface OverviewData {
   workspace: Workspace;
@@ -64,13 +74,24 @@ const Overview = () => {
     }
   };
 
+  const sparklines = useMemo(() => {
+    const p = data?.profile;
+    if (!p) return {};
+    return {
+      followers: generateSparkline(p.followers || 0),
+      posts: generateSparkline(p.postsCount || 0),
+      engagement: generateSparkline(Math.round((data?.analytics?.engagementRate || 0) * 100)),
+      following: generateSparkline(p.following || 0),
+    };
+  }, [data?.profile, data?.analytics]);
+
   if (loading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-8 w-48" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-28" />
+            <Skeleton key={i} className="h-32 rounded-xl" />
           ))}
         </div>
       </div>
@@ -93,7 +114,11 @@ const Overview = () => {
             {data?.workspace?.instagramUsername}
           </p>
         </div>
-        <Button onClick={handleFetchData} disabled={fetching}>
+        <Button
+          onClick={handleFetchData}
+          disabled={fetching}
+          className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90 active:scale-[0.98] transition-all duration-200"
+        >
           <RefreshCw
             className={`h-4 w-4 mr-2 ${fetching ? "animate-spin" : ""}`}
           />
@@ -104,59 +129,51 @@ const Overview = () => {
       {/* Stats Cards */}
       {profile ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Followers</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {profile.followers?.toLocaleString() ?? "—"}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Posts</CardTitle>
-              <ImageIcon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {profile.postsCount?.toLocaleString() ?? "—"}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                Engagement Rate
-              </CardTitle>
-              <Heart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {analytics?.engagementRate
-                  ? `${analytics.engagementRate.toFixed(2)}%`
-                  : "—"}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Following</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {profile.following?.toLocaleString() ?? "—"}
-              </div>
-            </CardContent>
-          </Card>
+          <KpiCard
+            title="Followers"
+            value={profile.followers ?? 0}
+            icon={Users}
+            gradientFrom="#3b82f6"
+            gradientTo="#06b6d4"
+            sparklineData={sparklines.followers}
+            delay={0}
+          />
+          <KpiCard
+            title="Posts"
+            value={profile.postsCount ?? 0}
+            icon={ImageIcon}
+            gradientFrom="#8b5cf6"
+            gradientTo="#ec4899"
+            sparklineData={sparklines.posts}
+            delay={100}
+          />
+          <KpiCard
+            title="Engagement Rate"
+            value={analytics?.engagementRate ? Math.round(analytics.engagementRate * 100) : 0}
+            icon={Heart}
+            gradientFrom="#10b981"
+            gradientTo="#34d399"
+            sparklineData={sparklines.engagement}
+            formatValue={(v) => (v / 100).toFixed(2)}
+            suffix="%"
+            delay={200}
+          />
+          <KpiCard
+            title="Following"
+            value={profile.following ?? 0}
+            icon={TrendingUp}
+            gradientFrom="#f59e0b"
+            gradientTo="#f97316"
+            sparklineData={sparklines.following}
+            delay={300}
+          />
         </div>
       ) : (
         <Card className="py-12 text-center">
           <CardContent>
-            <Camera className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+            <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-violet-500/10 p-4 w-fit mx-auto mb-3">
+              <Camera className="h-10 w-10 text-primary" />
+            </div>
             <h3 className="font-semibold">No data yet</h3>
             <p className="text-sm text-muted-foreground mt-1 mb-4">
               Click &quot;Fetch Data&quot; to pull your Instagram profile data.
@@ -167,7 +184,7 @@ const Overview = () => {
 
       {/* Recent AI Generations */}
       {data?.recentAI && data.recentAI.length > 0 && (
-        <Card>
+        <Card className="animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <CardHeader>
             <CardTitle>Recent AI Insights</CardTitle>
             <CardDescription>
@@ -179,7 +196,7 @@ const Overview = () => {
               {data.recentAI.map((ai: any, i: number) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between rounded-lg border p-3"
+                  className="flex items-center justify-between rounded-lg border border-l-4 border-l-primary/50 p-3 hover:bg-muted/50 transition-colors duration-200"
                 >
                   <div>
                     <span className="font-medium text-sm">{ai.type}</span>

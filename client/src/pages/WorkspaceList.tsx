@@ -31,7 +31,6 @@ import {
   Trash2,
   BarChart3,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 const WorkspaceList = () => {
   const { user, logout } = useAuth();
@@ -105,23 +104,24 @@ const WorkspaceList = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}
-      <nav className="flex items-center justify-between px-6 py-3 bg-card border-b">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="h-6 w-6 text-primary" />
-          <h2 className="text-xl font-bold">Social Analytics</h2>
+      <nav className="flex items-center justify-between px-6 py-3 bg-card/50 backdrop-blur-sm border-b sticky top-0 z-10">
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl bg-gradient-to-br from-primary to-violet-500 p-2">
+            <BarChart3 className="h-5 w-5 text-white" />
+          </div>
+          <h2 className="text-xl font-bold tracking-tight">Social Analytics</h2>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
               <AvatarImage src={user?.avatar} />
-              <AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-primary to-violet-500 text-white text-xs">
                 {user?.name?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium">{user?.name}</span>
+            <span className="text-sm font-medium hidden sm:inline">{user?.name}</span>
           </div>
-          <ThemeToggle />
-          <Button variant="outline" size="sm" onClick={handleLogout}>
+          <Button variant="outline" size="sm" onClick={handleLogout} className="active:scale-[0.98] transition-transform">
             <LogOut className="h-4 w-4 mr-1" />
             Logout
           </Button>
@@ -132,72 +132,75 @@ const WorkspaceList = () => {
       <main className="max-w-5xl mx-auto p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Workspaces</h1>
+            <h1 className="text-3xl font-bold tracking-tight gradient-text">Workspaces</h1>
             <p className="text-muted-foreground mt-1">
               Manage your Instagram analytics workspaces
             </p>
           </div>
 
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90">
-                <Plus className="h-4 w-4" />
-                New Workspace
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Workspace</DialogTitle>
-                <DialogDescription>
-                  Set up a new workspace to track an Instagram account and its
-                  competitors.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ws-name">Workspace Name</Label>
-                  <Input
-                    id="ws-name"
-                    placeholder="My Brand"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
+          {/* Desktop create button */}
+          <div className="hidden sm:block">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md bg-gradient-to-r from-primary to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:opacity-90 active:scale-[0.98] transition-all duration-200">
+                  <Plus className="h-4 w-4" />
+                  New Workspace
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Workspace</DialogTitle>
+                  <DialogDescription>
+                    Set up a new workspace to track an Instagram account and its
+                    competitors.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="ws-name">Workspace Name</Label>
+                    <Input
+                      id="ws-name"
+                      placeholder="My Brand"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ws-ig">Instagram Username</Label>
+                    <Input
+                      id="ws-ig"
+                      placeholder="yourbrand"
+                      value={igUsername}
+                      onChange={(e) => setIgUsername(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ws-comp">
+                      Competitors{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (comma-separated)
+                      </span>
+                    </Label>
+                    <Input
+                      id="ws-comp"
+                      placeholder="competitor1, competitor2"
+                      value={competitors}
+                      onChange={(e) => setCompetitors(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ws-ig">Instagram Username</Label>
-                  <Input
-                    id="ws-ig"
-                    placeholder="yourbrand"
-                    value={igUsername}
-                    onChange={(e) => setIgUsername(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ws-comp">
-                    Competitors{" "}
-                    <span className="text-muted-foreground font-normal">
-                      (comma-separated)
-                    </span>
-                  </Label>
-                  <Input
-                    id="ws-comp"
-                    placeholder="competitor1, competitor2"
-                    value={competitors}
-                    onChange={(e) => setCompetitors(e.target.value)}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleCreate} disabled={creating}>
-                  {creating ? "Creating..." : "Create"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCreate} disabled={creating} className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90">
+                    {creating ? "Creating..." : "Create"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Workspace Cards */}
@@ -218,13 +221,15 @@ const WorkspaceList = () => {
         ) : workspaces.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
-              <Camera className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-violet-500/10 p-5 w-fit mx-auto mb-4">
+                <Camera className="h-12 w-12 text-primary" />
+              </div>
               <h3 className="text-lg font-semibold">No workspaces yet</h3>
               <p className="text-muted-foreground mt-1 mb-4">
                 Create your first workspace to start tracking Instagram
                 analytics.
               </p>
-              <Button onClick={() => setDialogOpen(true)}>
+              <Button onClick={() => setDialogOpen(true)} className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Workspace
               </Button>
@@ -232,13 +237,17 @@ const WorkspaceList = () => {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {workspaces.map((ws) => (
+            {workspaces.map((ws, i) => (
               <Card
                 key={ws._id}
-                className="cursor-pointer hover:shadow-md transition-shadow group"
+                className="cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden animate-fade-in-up"
+                style={{ animationDelay: `${i * 80}ms` }}
               >
+                {/* Gradient top border */}
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-violet-500" />
+
                 <CardHeader
-                  className="pb-3"
+                  className="pb-3 pt-5"
                   onClick={() => navigate(`/workspaces/${ws._id}`)}
                 >
                   <div className="flex items-start justify-between">
@@ -263,10 +272,14 @@ const WorkspaceList = () => {
                   </div>
                 </CardHeader>
                 <CardContent onClick={() => navigate(`/workspaces/${ws._id}`)}>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Users className="h-3 w-3" />
-                    {ws.competitors.length} competitor
-                    {ws.competitors.length !== 1 ? "s" : ""}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5">
+                      <Users className="h-3 w-3" />
+                      <span className="text-xs font-medium">
+                        {ws.competitors.length} competitor
+                        {ws.competitors.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -274,6 +287,46 @@ const WorkspaceList = () => {
           </div>
         )}
       </main>
+
+      {/* Floating Action Button — mobile */}
+      <button
+        onClick={() => setDialogOpen(true)}
+        className="sm:hidden fixed bottom-6 right-6 z-50 rounded-full bg-gradient-to-r from-primary to-violet-600 p-4 text-white shadow-xl hover:scale-110 active:scale-95 transition-transform duration-200"
+      >
+        <Plus className="h-6 w-6" />
+      </button>
+
+      {/* Dialog for mobile FAB */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:hidden">
+          <DialogHeader>
+            <DialogTitle>Create Workspace</DialogTitle>
+            <DialogDescription>
+              Set up a new workspace to track an Instagram account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="ws-name-m">Workspace Name</Label>
+              <Input id="ws-name-m" placeholder="My Brand" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ws-ig-m">Instagram Username</Label>
+              <Input id="ws-ig-m" placeholder="yourbrand" value={igUsername} onChange={(e) => setIgUsername(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ws-comp-m">Competitors <span className="text-muted-foreground font-normal">(comma-separated)</span></Label>
+              <Input id="ws-comp-m" placeholder="competitor1, competitor2" value={competitors} onChange={(e) => setCompetitors(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleCreate} disabled={creating} className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90">
+              {creating ? "Creating..." : "Create"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
