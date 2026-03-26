@@ -31,6 +31,7 @@ import {
   Trash2,
   BarChart3,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const WorkspaceList = () => {
   const { user, logout } = useAuth();
@@ -119,6 +120,7 @@ const WorkspaceList = () => {
             </Avatar>
             <span className="text-sm font-medium">{user?.name}</span>
           </div>
+          <ThemeToggle />
           <Button variant="outline" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-1" />
             Logout

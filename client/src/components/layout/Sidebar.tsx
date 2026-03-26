@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { to: "", icon: LayoutDashboard, label: "Overview", end: true },
@@ -65,6 +66,11 @@ const Sidebar = () => {
           ))}
         </nav>
       </ScrollArea>
+
+      <Separator />
+      <div className="px-3 py-3 flex items-center justify-center">
+        <ThemeToggle />
+      </div>
     </div>
   );
 };
