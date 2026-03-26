@@ -14,6 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { BarChart3 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +40,15 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex flex-col bg-background">
+      <nav className="flex items-center justify-between px-6 py-3 border-b bg-card">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <span className="font-semibold text-sm">Social Analytics</span>
+        </div>
+        <ThemeToggle />
+      </nav>
+      <div className="flex-1 flex items-center justify-center p-4">
       <Card className="w-full max-w-[420px]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
@@ -99,6 +109,7 @@ const Login = () => {
           </p>
         </CardFooter>
       </Card>
+      </div>
     </div>
   );
 };
