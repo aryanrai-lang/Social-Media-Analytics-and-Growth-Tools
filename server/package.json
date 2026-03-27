@@ -22,9 +22,7 @@
     "openai": "^6.32.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "snoowrap": "^1.23.0"
-  },
-  "devDependencies": {
+    "snoowrap": "^1.23.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.16",
@@ -37,5 +35,7 @@
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2"
+  },
+  "devDependencies": {
   }
 }
