@@ -22,6 +22,7 @@ import {
   Camera,
 } from "lucide-react";
 import { KpiCard } from "@/components/dashboard/KpiCard";
+import { OverviewCharts } from "@/components/dashboard/OverviewCharts";
 
 function generateSparkline(base: number, points = 7): number[] {
   const data: number[] = [];
@@ -180,6 +181,11 @@ const Overview = () => {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Overview Charts */}
+      {profile && analytics && (
+        <OverviewCharts profile={profile} analytics={analytics} sparklines={sparklines} />
       )}
 
       {/* Recent AI Generations */}

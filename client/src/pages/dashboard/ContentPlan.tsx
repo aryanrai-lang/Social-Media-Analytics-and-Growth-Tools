@@ -29,6 +29,7 @@ import {
 import { ContentTypeBadge } from "@/components/dashboard/ContentTypeBadge";
 import { CollapsibleSection } from "@/components/dashboard/CollapsibleSection";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { ContentPlanCharts } from "@/components/dashboard/ContentPlanCharts";
 
 interface Post {
   time: string;
@@ -170,6 +171,9 @@ const ContentPlan = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Charts Visualization */}
+          <ContentPlanCharts data={plan} />
 
           {/* Daily Schedule */}
           {plan.days && plan.days.length > 0 && (

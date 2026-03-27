@@ -20,6 +20,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { CompetitorCharts } from "@/components/dashboard/CompetitorCharts";
 
 function MetricBar({ value, max, color }: { value: number; max: number; color: string }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
@@ -155,6 +156,11 @@ const Competitors = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Competitor Charts */}
+      {owner && competitors.length > 0 && (
+        <CompetitorCharts owner={owner} competitors={competitors} />
       )}
 
       {/* Competitor Profiles */}

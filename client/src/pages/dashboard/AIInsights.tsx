@@ -9,6 +9,7 @@ import { GapAnalysisView } from "@/components/dashboard/GapAnalysisView";
 import { GrowthStrategyView } from "@/components/dashboard/GrowthStrategyView";
 import { ContentIdeasView } from "@/components/dashboard/ContentIdeasView";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { GapAnalysisChart, GrowthStrategyChart, ContentIdeasChart } from "@/components/dashboard/AIInsightsCharts";
 
 const AIInsights = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,7 +124,10 @@ const AIInsights = () => {
                 </div>
               </div>
             ) : gapAnalysis ? (
-              <GapAnalysisView data={gapAnalysis} />
+              <>
+                <GapAnalysisChart data={gapAnalysis} />
+                <GapAnalysisView data={gapAnalysis} />
+              </>
             ) : (
               <EmptyState
                 icon={Target}
@@ -152,7 +156,10 @@ const AIInsights = () => {
                 <Skeleton className="h-64 w-full rounded-xl shimmer-bg" />
               </div>
             ) : growthStrategy ? (
-              <GrowthStrategyView data={growthStrategy} />
+              <>
+                <GrowthStrategyChart data={growthStrategy} />
+                <GrowthStrategyView data={growthStrategy} />
+              </>
             ) : (
               <EmptyState
                 icon={TrendingUp}
@@ -182,7 +189,10 @@ const AIInsights = () => {
                 ))}
               </div>
             ) : contentIdeas ? (
-              <ContentIdeasView data={contentIdeas} />
+              <>
+                <ContentIdeasChart data={contentIdeas} />
+                <ContentIdeasView data={contentIdeas} />
+              </>
             ) : (
               <EmptyState
                 icon={Lightbulb}
