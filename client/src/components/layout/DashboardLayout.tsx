@@ -1,4 +1,4 @@
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Sidebar from "@/components/layout/Sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/context/AuthContext";
@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const DashboardLayout = () => {
   const { user } = useAuth();
-  const { id } = useParams();
+  //const { id } = useParams();
 
   return (
     <div className="flex h-screen overflow-hidden">
